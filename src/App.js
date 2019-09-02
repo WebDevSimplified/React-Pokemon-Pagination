@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import Pagination from './Pagination'
+import React, { useState, useEffect } from 'react';
 import PokemonList from './PokemonList'
+import axios from 'axios'
+import Pagination from './Pagination';
 
-export default function App() {
-  const [loading, setLoading] = useState(true)
-  const [pokemon, setPokemon] = useState()
-  const [currentPageUrl, setCurrentPageUrl] = useState("https://pokeapi.co/api/v2/pokemon/")
-  const [prevPageUrl, setPrevPageUrl] = useState()
+function App() {
+  const [pokemon, setPokemon] = useState([])
+  const [currentPageUrl, setCurrentPageUrl] = useState("https://pokeapi.co/api/v2/pokemon")
   const [nextPageUrl, setNextPageUrl] = useState()
+  const [prevPageUrl, setPrevPageUrl] = useState()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     setLoading(true)
     let cancel
     axios.get(currentPageUrl, {
-      cancelToken: new axios.CancelToken((c) => cancel = c)
+      cancelToken: new axios.CancelToken(c => cancel = c)
     }).then(res => {
-      setPokemon(res.data.results)
       setLoading(false)
-      setPrevPageUrl(res.data.previous)
       setNextPageUrl(res.data.next)
+      setPrevPageUrl(res.data.previous)
+      setPokemon(res.data.results.map(p => p.name))
     })
 
     return () => cancel()
@@ -33,8 +33,8 @@ export default function App() {
     setCurrentPageUrl(prevPageUrl)
   }
 
-  if (loading) return <h1>Loading...</h1>
-
+  if (loading) return "Loading..."
+  
   return (
     <>
       <PokemonList pokemon={pokemon} />
@@ -43,5 +43,7 @@ export default function App() {
         gotoPrevPage={prevPageUrl ? gotoPrevPage : null}
       />
     </>
-  )
+  );
 }
+
+export default App;
